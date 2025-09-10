@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>BPD Criteria Check — Premium</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* ===== Accessible Premium Theme ===== */
+    :root{
+      --bg:#0d1117;         /* deep ink */
+      --surface:#121826;    /* card base (dark) */
+      --text:#e6edf3;       /* high contrast text on dark */
+      --muted:#a9b4c3;
+      --line:#2a3346;
+
+      --bg-light:#f7f9fc;   /* light mode bg */
+      --surface-light:#ffffff;
+      --text-light:#0a1020; /* high contrast text on light */
+      --muted-light:#53607a;
+      --line-light:#d9e2f2;
+
+      --accent:#5b8cff;     /* royal blue */
+      --accent-2:#9fc4ff;   /* softer blue for gradients */
+
+      --ok:#2ac38f; --warn:#f7c948; --danger:#ff6b6b;
+      --radius:16px;
+
+      --shadow-dark:0 10px 28px rgba(0,0,0,.35);
+      --shadow-light:0 8px 22px rgba(56,92,168,.12);
+    }
+    body{
+      margin:0;
+      font: 17px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    body.light{
+      background: var(--bg-light);
+      color: var(--text-light);
+    }
+    .wrap{max-width:980px; margin:auto; padding:16px}
+    header{
+      position: sticky; top:0; z-index:50;
+      background: color-mix(in oklab, var(--bg) 85%, transparent);
+      border-bottom:1px solid var(--line);
+      backdrop-filter: blur(8px);
+    }
+    body.light header{
+      background: color-mix(in oklab, var(--bg-light) 85%, transparent);
+      border-bottom:1px solid var(--line-light);
+    }
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:12px }
+    .brand{ display:flex; align-items:center; gap:12px }
+    .logo{
+      width:38px; height:38px; border-radius:50%;
+      background: linear-gradient(180deg,var(--accent),var(--accent-2));
+      display:grid; place-items:center; font-weight:900; color:#081228; box-shadow: var(--shadow-dark);
+    }
+    body.light .logo{ box-shadow: var(--shadow-light) }
+
+    h1{ font-size:clamp(22px,2.8vw,32px); margin:0 }
+    h2{ font-size:18px; margin:0 0 8px }
+    p.lead{ margin:6px 0 0; color: var(--muted) }
+    body.light p.lead{ color: var(--muted-light) }
+
+    .btn, .toggle{
+      appearance:none; border-radius:12px; cursor:pointer; font-weight:650;
+      padding:10px 14px; border:1px solid var(--line); background: var(--surface); color: var(--text);
+      transition: transform .06s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+      box-shadow: var(--shadow-dark);
+    }
+    .btn:hover, .toggle:hover{ transform: translateY(-1px) }
+    .btn.primary{
+      border-color: transparent;
+      background: linear-gradient(180deg,var(--accent),var(--accent-2));
+      color:#0a1430;
+    }
+    body.light .btn, body.light .toggle{
+      border:1px solid var(--line-light); background: var(--surface-light); color: var(--text-light); box-shadow: var(--shadow-light);
+    }
+
+    main{ padding:24px 16px 60px }
+    .grid{ display:grid; gap:18px }
+    @media (min-width: 880px){ .grid{ grid-template-columns: 1.14fr .86fr } }
+
+    .card{
+      background: var(--surface);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      padding:20px;
+      box-shadow: var(--shadow-dark);
+    }
+    body.light .card{
+      background: var(--surface-light);
+      border:1px solid var(--line-light);
+      box-shadow: var(--shadow-light);
+    }
+
+    /* ===== Criteria items with "shine" on select ===== */
+    .criteria label{
+      position: relative;
+      display:flex; gap:12px; align-items:flex-start;
+      padding:12px 14px; margin:10px 0;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background: color-mix(in oklab, var(--surface) 92%, transparent);
+      transition: border-color .25s ease, box-shadow .25s ease, background .25s ease;
+      overflow: clip;
+    }
+    body.light .criteria label{
+      border:1px solid var(--line-light);
+      background: color-mix(in oklab, var(--surface-light) 94%, transparent);
+    }
+    .criteria small a{ color: var(--accent-2); text-decoration: underline dotted }
+    .criteria input[type=checkbox]{ transform: translateY(3px); min-width:20px; min-height:20px }
+
+    /* Glow + shine when checked */
+    .criteria label:has(input:checked){
+      border-color: color-mix(in oklab, var(--accent) 65%, var(--line));
+      box-shadow:
+        0 0 0 2px color-mix(in oklab, var(--accent) 40%, transparent),
+        0 10px 24px rgba(0,0,0,.25);
+      background: color-mix(in oklab, var(--surface) 88%, var(--accent-2) 12%);
+    }
+    body.light .criteria label:has(input:checked){
+      box-shadow:
+        0 0 0 2px color-mix(in oklab, var(--accent) 35%, transparent),
+        0 10px 24px rgba(56,92,168,.18);
+      background: color-mix(in oklab, var(--surface-light) 90%, var(--accent-2) 10%);
+    }
+
+    /* The "shine" sweep */
+    .criteria label::after{
+      content:"";
+      position:absolute; inset:-2px;
+      background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,.2) 50%, transparent 60%);
+      transform: translateX(-120%) skewX(-8deg);
+      pointer-events:none;
+    }
+    .criteria label:has(input:checked)::after{
+      animation: shine .9s ease-out;
+    }
+    @keyframes shine{
+      from{ transform: translateX(-120%) skewX(-8deg) }
+      to{   transform: translateX(120%)  skewX(-8deg) }
+    }
+
+    /* Focus ring for keyboard users */
+    .criteria input[type=checkbox]:focus-visible{
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    .actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px }
+    .result{
+      margin-top:12px; padding:14px; border-radius:12px;
+      border:1px dashed var(--line);
+      background: color-mix(in oklab, var(--surface) 90%, transparent);
+      font-weight:700;
+    }
+    .result.good{ border-color: var(--ok) }
+    .result.warn{ border-color: var(--warn) }
+    .result.bad{ border-color: var(--danger) }
+    .muted{ color: var(--muted) }
+    body.light .muted{ color: var(--muted-light) }
+
+    footer{ border-top:1px solid var(--line); padding:24px 16px; color: var(--muted); text-align:center }
+    body.light footer{ border-top:1px solid var(--line-light); color: var(--muted-light) }
+
+    .note{
+      font-size:.95rem; color: var(--muted);
+      background: color-mix(in oklab, var(--surface) 92%, transparent);
+      border:1px solid var(--line); border-radius:12px; padding:12px; margin-top:12px;
+    }
+    body.light .note{
+      color: var(--muted-light);
+      background: color-mix(in oklab, var(--surface-light) 94%, transparent);
+      border:1px solid var(--line-light);
+    }
+
+    /* Respect prefers-reduced-motion */
+    @media (prefers-reduced-motion: reduce){
+      .criteria label:has(input:checked)::after{ animation: none }
+      .btn, .toggle{ transition: none }
+      .criteria label{ transition: none }
+    }
+  </style>
+
+  <!-- PDF export libs -->
+  <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">MF</div>
+        <div>
+          <div style="font-size:13px; opacity:.82; letter-spacing:.2px">Maristo Flow</div>
+          <h1>BPD Criteria Self-Check</h1>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px">
+        <button class="toggle" id="modeBtn" type="button" aria-pressed="false" title="Toggle light/dark">☯ Mode</button>
+        <button class="btn" id="pdfBtn" type="button" title="Export your selections to PDF">⬇ Export PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid">
+    <!-- ===== Left: Criteria ===== -->
+    <section class="card" id="checkCard">
+      <h2>Screening checklist (DSM-5/DSM-5-TR features)</h2>
+      <p class="lead">Select any features you experience. Links open the <strong>official ICD-11</strong> clinical descriptions (WHO – Borderline pattern).</p>
+
+      <form id="criteriaForm" class="criteria">
+        <label>
+          <input type="checkbox" data-name="Abandonment avoidance" />
+          <span>
+            Frantic efforts to avoid real or imagined <strong>abandonment</strong>.
+            <br><small>Reference: <a target="_blank" rel="noopener" href="https://iris.who.int/bitstream/handle/10665/375767/9789240077263-eng.pdf">ICD-11 Clinical descriptions — Borderline pattern</a></small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" data-name="Unstable intense relationships" />
+          <span>
+            Pattern of <strong>unstable, intense relationships</strong> (idealization ↔ devaluation).
+            <br><small>Reference: <a target="_blank" rel="noopener" href="https://iris.who.int/bitstream/handle/10665/375767/9789240077263-eng.pdf">ICD-11 Clinical descriptions — Borderline pattern</a></small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" data-name="Identity disturbance" />
+          <span>
+            <strong>Identity disturbance</strong> / markedly unstable self-image or sense of self.
+            <br><small>Reference: <a target="_blank" rel="noopener" href="https://iris.who.int/bitstream/handle/10665/375767/9789240077263-eng.pdf">ICD-11 Clinical descriptions — Borderline pattern</a></small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" data-name="Impulsivity in risky domains" />
+          <span>
+            <strong>Impulsivity</strong> in potentially self-damaging areas (e.g., spending, sex, substances, reckless driving).
+            <br><small>Reference: <a target="_blank" rel="noopener" href="https://iris.who.int/bitstream/handle/10665/375767/9789240077263-eng.pdf">ICD-11 Clinical descriptions — Borderline pattern</a></small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" data-name="Recurrent self-harm or suicidal behavior" />
+          <span>
+            <strong>Recurrent suicidal behavior</strong>, gestures, threats, or self-harm.
+            <br><small>Reference: <a target="_blank" rel="noopener" href="https://iris.who.int/bitstream/handle/10665/375767/9789240077263-eng.pdf">ICD-11 Clinical descriptions — Borderline pattern</a></small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" data-name="Affective instability" />
+          <span>
+            <strong>Affective instability</strong> due to marked reactivity of mood.
+            <br><small>Reference: <a target="_blank" rel="noopener" href="https://iris.who.int/bitstream/handle/10665/375767/9789240077263-eng.pdf">ICD-11 Clinical descriptions — Borderline pattern</a></small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" data-name="Chronic emptiness" />
+          <span>
+            <strong>Chronic feelings of emptiness</strong>.
+            <br><small>Reference: <a target="_blank" rel="noopener" href="https://iris.who.int/bitstream/handle/10665/375767/9789240077263-eng.pdf">ICD-11 Clinical descriptions — Borderline pattern</a></small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" data-name="Inappropriate intense anger" />
+          <span>
+            <strong>Inappropriate, intense anger</strong> or difficulty controlling anger.
+            <br><small>Reference: <a target="_blank" rel="noopener" href="https://iris.who.int/bitstream/handle/10665/375767/9789240077263-eng.pdf">ICD-11 Clinical descriptions — Borderline pattern</a></small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" data-name="Stress-related paranoia or dissociation" />
+          <span>
+            <strong>Transient, stress-related paranoia</strong> or severe dissociative symptoms.
+            <br><small>Reference: <a target="_blank" rel="noopener" href="https://iris.who.int/bitstream/handle/10665/375767/9789240077263-eng.pdf">ICD-11 Clinical descriptions — Borderline pattern</a></small>
+          </span>
+        </label>
+
+        <div class="actions">
+          <button type="button" class="btn primary" id="calcBtn">Check Result</button>
+          <button type="button" class="btn" id="clearBtn" title="Clear all selections"><span aria-hidden="true">✕</span> Clear</button>
+        </div>
+        <div id="result" class="result muted" role="status" aria-live="polite">Your result will appear here.</div>
+
+        <div class="note">
+          <strong>Heads-up:</strong> DSM-5/DSM-5-TR uses a heuristic of <strong>5 of 9</strong> features that are persistent, pervasive, and impairing. ICD-11 provides a Borderline pattern specifier in its personality disorder model. See: <a target="_blank" rel="noopener" href="https://www.nimh.nih.gov/health/topics/borderline-personality-disorder">NIMH overview</a> and <a target="_blank" rel="noopener" href="https://www.nice.org.uk/guidance/cg78">NICE guideline</a>.
+        </div>
+      </form>
+    </section>
+
+    <!-- ===== Right: Bot + Disclaimers ===== -->
+    <aside class="card">
+      <h2>FAQ bot</h2>
+      <p class="lead" style="margin-top:-6px">Ask short questions like “emptiness?” or “what is DBT?”</p>
+      <input id="chatInput" placeholder="Type your question and press Enter" style="width:100%; padding:12px 12px; border-radius:12px; border:1px solid var(--line); background:transparent; color:inherit" onkeypress="if(event.key==='Enter'){chat()}" />
+      <div id="chatLog" class="muted" style="margin-top:12px; font-size:1rem"></div>
+
+      <div class="note" style="margin-top:16px">
+        <strong>Disclaimers</strong>
+        <ul style="padding-left:18px; margin:8px 0 0">
+          <li>This is an informational self-check, not a diagnosis or medical advice.</li>
+          <li>If your responses suggest elevated risk (e.g., self-harm, suicidality), seek professional help promptly.</li>
+          <li>In an emergency, call your local emergency number. In the U.S., call <strong>988</strong> (Suicide & Crisis Lifeline) or <strong>911</strong>.</li>
+        </ul>
+      </div>
+
+      <div class="note" style="margin-top:12px">
+        <strong>Learn more</strong><br>
+        WHO: <a target="_blank" rel="noopener" href="https://iris.who.int/bitstream/handle/10665/375767/9789240077263-eng.pdf">ICD-11 clinical descriptions (Borderline pattern)</a><br>
+        NIMH overview: <a target="_blank" rel="noopener" href="https://www.nimh.nih.gov/health/topics/borderline-personality-disorder">Borderline Personality Disorder</a><br>
+        NIMH fact sheet (PDF): <a target="_blank" rel="noopener" href="https://infocenter.nimh.nih.gov/sites/default/files/publications/borderline-personality-disorder_0.pdf">Signs & treatments</a><br>
+        NICE guideline (UK): <a target="_blank" rel="noopener" href="https://www.nice.org.uk/guidance/cg78">Recognition & management</a>
+      </div>
+      <p class="muted" style="margin-top:12px">Producer: <strong>Maristo Flow</strong></p>
+    </aside>
+  </main>
+
+  <footer>
+    <div class="wrap">© <span id="yr"></span> Maristo Flow. Educational use only.</div>
+  </footer>
+
+  <script>
+    // Mode toggle
+    const modeBtn = document.getElementById('modeBtn');
+    modeBtn.addEventListener('click', () => {
+      const isLight = document.body.classList.toggle('light');
+      modeBtn.setAttribute('aria-pressed', isLight ? 'true' : 'false');
+    });
+
+    // Year
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    // Calculate / Clear
+    const form = document.getElementById('criteriaForm');
+    const resultEl = document.getElementById('result');
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      [...form.querySelectorAll('input[type=checkbox]')].forEach(cb => cb.checked = false);
+      setResult("Your result will appear here.", "muted");
+    });
+
+    function setResult(text, tone="muted"){
+      resultEl.className = "result " + (tone === "good" ? "good" : tone === "bad" ? "bad" : tone === "warn" ? "warn" : "");
+      resultEl.textContent = text;
+    }
+
+    function calculate(){
+      const boxes = [...form.querySelectorAll('input[type=checkbox]')];
+      const checked = boxes.filter(b => b.checked);
+      const names = checked.map(b => b.dataset.name);
+      const n = checked.length;
+
+      if(n >= 5){
+        setResult(`You checked ${n} of 9 features. This meets the usual screening rule-of-thumb (≥5). Consider a professional evaluation.`, "warn");
+      } else if(n === 0){
+        setResult(`You checked none of the listed features. If you’re unsure, speak with a clinician for guidance.`, "good");
+      } else {
+        setResult(`You checked ${n} of 9 features. Fewer than five does not suggest BPD under DSM-5/DSM-5-TR screening heuristics.`, "good");
+      }
+
+      window.__bpdLast = { count:n, items:names, when:new Date().toISOString() };
+    }
+
+    // PDF export
+    document.getElementById('pdfBtn').addEventListener('click', async () => {
+      if(!window.__bpdLast) calculate();
+      const { jsPDF } = window.jspdf || {};
+      if(!jsPDF){ alert("PDF library not loaded yet. Please try again in a moment."); return; }
+
+      const sum = window.__bpdLast || {count:0, items:[], when:new Date().toISOString()};
+      const container = document.createElement('div');
+      container.style.width = "780px";
+      container.style.padding = "24px";
+      container.style.fontFamily = "Inter, Arial, sans-serif";
+      container.style.color = "#0a1020";
+      container.style.background = "#ffffff";
+      container.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#5b8cff,#9fc4ff);display:grid;place-items:center;font-weight:900;color:#081228">MF</div>
+          <div>
+            <div style="font-size:12px;opacity:.7">Maristo Flow</div>
+            <h2 style="margin:4px 0 0;font-size:20px">BPD Criteria Self-Check — Summary</h2>
+          </div>
+        </div>
+        <hr style="margin:12px 0;border:none;border-top:1px solid #e4ecff"/>
+        <p><strong>Date:</strong> ${new Date(sum.when).toLocaleString()}</p>
+        <p><strong>Features checked (${sum.count}/9):</strong> ${sum.items.length? sum.items.join(", ") : "None"}</p>
+        <p><strong>References:</strong>
+          <br>• WHO ICD-11 Clinical descriptions — Borderline pattern (2024)
+          <br>• NIMH overview & fact sheet
+          <br>• NICE guideline (UK)
+        </p>
+        <div style="font-size:12px;color:#3b4761;background:#f7f9ff;border:1px solid #e4ecff;border-radius:10px;padding:10px;margin-top:8px">
+          <strong>Disclaimers:</strong> Informational only; not a diagnosis. If you have thoughts of self-harm or feel unsafe, seek urgent help. In the U.S., call 988 or 911; otherwise use your local emergency number.
+        </div>
+      `;
+      const canvas = await html2canvas(container, { scale: 2, backgroundColor:"#ffffff" });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ unit:"pt", format:"a4" });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const imgW = pageW - 64;
+      const imgH = canvas.height * (imgW / canvas.width);
+      pdf.addImage(imgData, 'PNG', 32, 32, imgW, imgH);
+      pdf.save("BPD-self-check-MaristoFlow.pdf");
+    });
+
+    // Static FAQ bot
+    const info = {
+      "abandonment":"Fear of abandonment can trigger intense anxiety or anger; safety plans and attachment-focused therapies may help.",
+      "relationships":"Rapid shifts between idealization and devaluation can strain bonds; mentalization-based therapy targets this.",
+      "identity":"An unstable self-image is common; therapies often work on values, goals, and coherent self-narratives.",
+      "impulsivity":"Risky behaviors (spending, sex, substances, driving) can be safety targets in DBT and GPM.",
+      "suicidal":"Self-harm/suicidality needs active safety planning; seek professional support.",
+      "affective":"Fast mood reactivity (‘affective instability’) is a core feature; emotion-regulation skills are central.",
+      "emptiness":"Chronic emptiness is frequent; work on meaning, routines, and connection can help.",
+      "anger":"Anger dyscontrol is treatable with skills (opposite action, time-outs, repair).",
+      "paranoia":"Under stress, transient paranoia/dissociation may arise; grounding and stabilization are key.",
+      "dbt":"DBT is an evidence-based treatment focusing on skills (mindfulness, distress tolerance, emotion regulation, interpersonal effectiveness).",
+      "mbt":"MBT improves understanding of self/others to reduce reactivity.",
+      "gpm":"GPM is a pragmatic, evidence-informed approach for BPD."
+    };
+    function chat(){
+      const input = document.getElementById('chatInput');
+      const log = document.getElementById('chatLog');
+      const q = (input.value||"").trim();
+      if(!q) return;
+      input.value = "";
+      const key = Object.keys(info).find(k => q.toLowerCase().includes(k));
+      const ans = key ? info[key] : "Try: abandonment, relationships, identity, impulsivity, suicidal, affective, emptiness, anger, paranoia, DBT, MBT, GPM.";
+      log.innerHTML += `<p><strong>You</strong></p><p>${q}</p><p><strong>Bot</strong></p><p>${ans}</p><hr style="border:none;border-top:1px solid ${getComputedStyle(document.body).getPropertyValue('--line')};opacity:.45">`;
+      log.scrollTop = log.scrollHeight;
+    }
+  </script>
+</body>
+</html>
